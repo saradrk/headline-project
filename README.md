@@ -20,3 +20,6 @@ Creating a newspaper headline corpus
 * JUNGE FREIHEIT (jf): 1502 headlines
   * 2013 - 2021
   * partial heading, no subheading
+* Bild (bild): 3222 headlines
+  * 2013 - 2021
+  * no heading, no subheading
