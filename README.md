@@ -23,3 +23,6 @@ Creating a newspaper headline corpus
 * Bild (bild): 3222 headlines
   * 2013 - 2021
   * no heading, no subheading
+* Süddeutsche Zeitung (sueddeutsche): 1143 headlines
+  * 2020 - 2021
+  * complete heading, no subheading
