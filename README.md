@@ -5,7 +5,7 @@ Creating a newspaper headline corpus
 * Handelsblatt (handelsblatt): 1641 headlines
   * 2013-2021
   * partial heading and subheading
-* Frankfurter Allgemeine (faz): 3090 headlines
+* Frankfurter Allgemeine (faz): 3128 headlines
   * 2013 - 2021
   * partial heading and subheading
 * DIE WELT (welt): 2145 headlines
