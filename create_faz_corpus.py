@@ -41,8 +41,8 @@ def month_name_to_nr(name):
 def create_corpus(out_csv):
     url = 'https://fazarchiv.faz.net/fazSearch/index/searchForm?q=AfD&'\
         'search_in=TI&timePeriod=timeFilter&timeFilter=&DT_from=&DT_to=&'\
-        'KO%2CSO=&crxdefs=&NN=&CO%2C1E=&CN=&BC=&submitSearch=Suchen&'\
-        'maxHits=&sorting=&toggleFilter=&dosearch=new&offset={}&format=#hitlist'
+        'KO%2CSO=&crxdefs=&NN=&CO%2C1E=&CN=&BC=&submitSearch=Suchen&maxHits=&'\
+        'sorting=&toggleFilter=&dosearch=new&format=&offset={}#hitlist'
     with open(out_csv, 'w+', newline='') as csv_file:
         writer = csv.writer(csv_file)
         writer.writerow(["ID",
@@ -62,7 +62,7 @@ def create_corpus(out_csv):
         'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0'
         }
         n = 1
-        max_offset = 4840
+        max_offset = 4870
         logging.info(f'Start scanning archive of {(max_offset + 10)} articles... ')
         # URL-Parameter: Archiv-Seite 1 == Offset = 0, Seite  + 1 == Offset + 10
         for j in range(0, max_offset, 10):
@@ -93,7 +93,11 @@ def create_corpus(out_csv):
                         logging.info(f'Missing overline on site {((j / 10) + 1)}')
                         overline = None
                     subheading = over_and_sub_header[1].get_text()
-                    headline_tokens.extend(subheading.split())
+                    # Remove subheadings stating the authors:
+                    if subheading[0:4] == 'Von ':
+                        subheading = None
+                    else:
+                        headline_tokens.extend(subheading.split())
                 # Case only overline exists:
                 elif len(over_and_sub_header) == 1:
                     try:
@@ -105,7 +109,9 @@ def create_corpus(out_csv):
                     subheading = None
                 else:
                     logging.info(f'Problem with overline or subheading on site {((j / 10) + 1)}')
-                if 'afd' in set(map(lambda x: x.lower(), headline_tokens)):
+                # Quotes can be included in headline
+                afd_tokens = {'AfD', '"AfD"', '"AfD', 'AfD"'}
+                if len(afd_tokens.intersection(set(headline_tokens))) > 0:
                     writer.writerow([n,
                                      None,
                                      month,
