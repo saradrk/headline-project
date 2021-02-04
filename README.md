@@ -2,7 +2,7 @@
 Creating a newspaper headline corpus
 
 ## Newspaper corpora as of 03.02.2021 (no preprocessing)
-* Handelsblatt (handelsblatt): 1641 headlines
+* Handelsblatt (handelsblatt): 1640 headlines
   * 2013-2021
   * partial heading and subheading
 * Frankfurter Allgemeine (faz): 3128 headlines
