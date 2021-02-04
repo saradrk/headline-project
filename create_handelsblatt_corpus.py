@@ -1,9 +1,9 @@
-# Sara Derakhshani, 01.02.2021
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# Sara Derakhshani, 02.02.2021
 # Korpus aus Überschriften des Handelsblatt erstellen
-# URL und Schleifenparameter müssen angepasst werden
-# Suchbegriff variierbar
+# Schleifenparameter müssen aktualisiert werden
 # HTML-Patters variierbar bzw. müssen evtl. aktualisiert werden
-
 
 import logging
 import html
@@ -23,9 +23,9 @@ logging.basicConfig(filename='create_handelsblatt_corpus.log',
 
 
 def create_corpus(out_csv):
-    url = 'https://www.handelsblatt.com/suche/?p3616352={}'\
-        '&sw=AfD&search-ressort=-1&search-doctype='\
-        'article&search-authorids=-1&search-sort=date'
+    url = 'https://www.handelsblatt.com/suche/?p3616352={}&sw=AfD&'\
+        'search-ressort=-1&search-doctype=article&search-authorids='\
+        '-1&search-sort=date'
     with open(out_csv, 'w+', newline='') as csv_file:
         writer = csv.writer(csv_file)
         writer.writerow(["ID",
@@ -45,7 +45,7 @@ def create_corpus(out_csv):
         'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0'
         }
         n = 1
-        archive_sites_n = 651
+        archive_sites_n = 652
         logging.info(f'Start scanning archive of {(archive_sites_n*10)} articles... ')
         for j in range(n, archive_sites_n):
             req = requests.get(url.format(j), headers)
@@ -75,11 +75,12 @@ def create_corpus(out_csv):
                     end_pos = subheading.find("Mehr…") - 1
                     subheading = subheading[0:end_pos]
                     headline_tokens.extend(subheading.split())
-                    # Remove 'Mehr...' and following authors
                 except Exception as e:
                     logging.warning(f'Problem with getting subheading on site {j}: {e}')
                     subheading = None
-                if 'afd' in set(map(lambda x: x.lower(), headline_tokens)):
+                # Quotes can be included in headline
+                afd_tokens = {'AfD', '"AfD"', '"AfD', 'AfD"'}
+                if len(afd_tokens.intersection(set(headline_tokens))) > 0:
                     writer.writerow([n,
                                      day,
                                      month,
