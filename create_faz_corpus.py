@@ -1,8 +1,10 @@
-# Sara Derakhshani, 01.02.2021
-# Korpus aus Ãœberschriften der FAZ erstellen
-# URL und Schleifenparameter mÃ¼ssen angepasst werden
+#!/usr/bin/env python3
+# -*- coding: latin-1 -*-
+
+# Korpus aus Überschriften der FAZ erstellen
+# URL und Schleifenparameter müssen angepasst werden
 # Suchbegriff variierbar
-# HTML-Patters variierbar bzw. mÃ¼ssen evtl. aktualisiert werden
+# HTML-Patters variierbar bzw. müssen evtl. aktualisiert werden
 
 
 import logging
@@ -24,7 +26,7 @@ logging.basicConfig(filename='create_faz_corpus.log',
 def month_name_to_nr(name):
     converter = {'Januar': '01',
                  'Februar': '02',
-                 'MÃ¤rz': '03',
+                 'März': '03',
                  'April': '04',
                  'Mai': '05',
                  'Juni': '06',
@@ -41,8 +43,8 @@ def month_name_to_nr(name):
 def create_corpus(out_csv):
     url = 'https://fazarchiv.faz.net/fazSearch/index/searchForm?q=AfD&'\
         'search_in=TI&timePeriod=timeFilter&timeFilter=&DT_from=&DT_to=&'\
-        'KO%2CSO=&crxdefs=&NN=&CO%2C1E=&CN=&BC=&submitSearch=Suchen&maxHits=&'\
-        'sorting=&toggleFilter=&dosearch=new&format=&offset={}#hitlist'
+        'KO%2CSO=&crxdefs=&NN=&CO%2C1E=&CN=&BC=&submitSearch=Suchen&'\
+        'maxHits=&sorting=&toggleFilter=&dosearch=new&format=&offset={}#hitlist'
     with open(out_csv, 'w+', newline='') as csv_file:
         writer = csv.writer(csv_file)
         writer.writerow(["ID",
@@ -50,8 +52,8 @@ def create_corpus(out_csv):
                          "MONAT",
                          "TAG",
                          "SPITZMARKE",
-                         "ÃœBERSCHRIFT",
-                         "UNTERÃœBERSCHRIFT"
+                         "ÜBERSCHRIFT",
+                         "UNTERÜBERSCHRIFT"
                          ]
                         )
         headers = {
@@ -78,40 +80,37 @@ def create_corpus(out_csv):
                 year = year[0:-1]
                 headline = teaser.h3.a.get_text()
                 # To check wether 'AfD' is in overline or headline or subheading:
-                headline_tokens = headline.split()
-                # Spitzmarke und UnterÃ¼berschrift extrahieren (wenn sie existieren)
+                complete_teaser_text = headline
+                # Spitzmarke und Unterüberschrift extrahieren (wenn sie existieren)
                 # Spitzmarken-Tag existiert auch ohne Spitzmarkentext (dann leer)
-                # UnterÃ¼berschriften-Tag nicht
+                # Unterüberschriften-Tag nicht
                 over_and_sub_header = teaser.find_all("h2")
                 # Case subheading and overline exist:
                 if len(over_and_sub_header) == 2:
                     # Check if overline h2-tag contains text
                     try:
                         overline = over_and_sub_header[0].get_text()
-                        headline_tokens.extend(overline.split())
+                        complete_teaser_text = complete_teaser_text + ' ' + overline
                     except:
-                        logging.info(f'Missing overline on site {((j / 10) + 1)}')
                         overline = None
                     subheading = over_and_sub_header[1].get_text()
                     # Remove subheadings stating the authors:
                     if subheading[0:4] == 'Von ':
                         subheading = None
                     else:
-                        headline_tokens.extend(subheading.split())
+                        complete_teaser_text = complete_teaser_text + ' ' + subheading
                 # Case only overline exists:
                 elif len(over_and_sub_header) == 1:
                     try:
                         overline = over_and_sub_header[0].get_text()
-                        headline_tokens.extend(overline.split())
+                        complete_teaser_text = complete_teaser_text + ' ' + overline
                     except:
-                        logging.info(f'Missing overline and subheading on site {((j / 10) + 1)}')
                         overline = None
                     subheading = None
                 else:
                     logging.info(f'Problem with overline or subheading on site {((j / 10) + 1)}')
                 # Quotes can be included in headline
-                afd_tokens = {'AfD', '"AfD"', '"AfD', 'AfD"'}
-                if len(afd_tokens.intersection(set(headline_tokens))) > 0:
+                if 'AfD' in complete_teaser_text:
                     writer.writerow([n,
                                      None,
                                      month,

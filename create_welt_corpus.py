@@ -1,7 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: latin-1 -*-
+
 # Sara Derakhshani, 02.02.2021
-# Korpus aus Ãœberschriften der Welt erstellen
-# Schleifenparameter mÃ¼ssen aktualisiert werden
-# HTML-Patters variierbar bzw. mÃ¼ssen evtl. aktualisiert werden
+# Korpus aus Überschriften der Welt erstellen
+# Schleifenparameter müssen aktualisiert werden
+# HTML-Patters variierbar bzw. müssen evtl. aktualisiert werden
 
 
 import logging
@@ -11,7 +14,7 @@ from bs4 import BeautifulSoup
 import csv
 
 # https://www.welt.de/schlagzeilen/
-# Keine Suche im Archiv mÃ¶glich: Suche nach 'AfD' erfolgt im Code
+# Keine Suche im Archiv möglich: Suche nach 'AfD' erfolgt im Code
 
 
 logging.basicConfig(filename='create_welt_corpus.log',
@@ -23,15 +26,15 @@ logging.basicConfig(filename='create_welt_corpus.log',
 def create_corpus(out_csv):
     # Add day, month, year
     url = 'https://www.welt.de/schlagzeilen/nachrichten-vom-{}-{}-{}.html'
-    with open(out_csv, 'w+', newline='') as csv_file:
+    with open(out_csv, 'w+', newline='', encoding='utf-8') as csv_file:
         writer = csv.writer(csv_file)
         writer.writerow(["ID",
                          "JAHR",
                          "MONAT",
                          "TAG",
                          "SPITZMARKE",
-                         "ÃœBERSCHRIFT",
-                         "UNTERÃœBERSCHRIFT"
+                         "ÜBERSCHRIFT",
+                         "UNTERÜBERSCHRIFT"
                          ]
                         )
         headers = {
@@ -45,7 +48,7 @@ def create_corpus(out_csv):
         n = 1
         logging.info(f'Start scanning archive... ')
         # Search archive by day: Years 2021 - 1995, months Jan. - Dec., days 1-31
-        for year in range(2021, 1994, -1):
+        for year in range(2021, 2012, -1):
             logging.info(f'Scanning {year}...')
             for month in range(1, 13):
                 logging.info(f'Scanning {month}/{year}...')
@@ -64,16 +67,15 @@ def create_corpus(out_csv):
                         for headline_teaser in all_headlines:
                             headline = headline_teaser.h4.a.get_text()
                             # To check wether headline contains 'AfD':
-                            headline_tokens = headline.split()
-                            # Checken ob Spitzmarke existiert (bei Ã¤lteren Artikeln nicht der Fall)
+                            complete_teaser_text = headline
+                            # Checken ob Spitzmarke existiert (bei älteren Artikeln nicht der Fall)
                             try:
                                 overline = headline_teaser.div.h5.get_text()
                                 # To check wether overline contains 'AfD':
-                                headline_tokens.extend(overline.split())
+                                complete_teaser_text = complete_teaser_text + ' ' + overline
                             except:
                                 overline = None
-                            # Search for key word
-                            if 'AfD' in set(headline_tokens):
+                            if 'AfD' in complete_teaser_text:
                                 # Welt has no subheadings
                                 writer.writerow([n,
                                                  day,

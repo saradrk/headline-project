@@ -45,7 +45,7 @@ def create_corpus(out_csv):
         'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0'
         }
         n = 1
-        archive_sites_n = 652
+        archive_sites_n = 653
         logging.info(f'Start scanning archive of {(archive_sites_n*10)} articles... ')
         for j in range(n, archive_sites_n):
             req = requests.get(url.format(j), headers)
@@ -62,10 +62,10 @@ def create_corpus(out_csv):
                 headline = headline_tag.find("span", class_="vhb-headline").get_text()
                 # Check wether 'AfD' is in overline or headline or subheading
                 # if yes add to csv
-                headline_tokens = headline.split()
+                complete_teaser_text = headline
                 try:
                     overline = headline_tag.em.get_text()
-                    headline_tokens.extend(overline.split())
+                    complete_teaser_text = complete_teaser_text + ' ' + overline
                 except Exception as e:
                     logging.warning(f'Problem with getting overline on site {j}: {e}')
                     overline = None
@@ -74,13 +74,12 @@ def create_corpus(out_csv):
                     # Remove 'Mehr…' and following authors
                     end_pos = subheading.find("Mehr…") - 1
                     subheading = subheading[0:end_pos]
-                    headline_tokens.extend(subheading.split())
+                    complete_teaser_text = complete_teaser_text + ' ' + subheading
                 except Exception as e:
                     logging.warning(f'Problem with getting subheading on site {j}: {e}')
                     subheading = None
                 # Quotes can be included in headline
-                afd_tokens = {'AfD', '"AfD"', '"AfD', 'AfD"'}
-                if len(afd_tokens.intersection(set(headline_tokens))) > 0:
+                if 'AfD' in complete_teaser_text:
                     writer.writerow([n,
                                      day,
                                      month,
