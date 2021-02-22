@@ -10,7 +10,8 @@ Created on Wed Feb 10 15:56:19 2021
 class NewspaperHeadline:
     """Class for newspaper headline objects.
 
-    Attributes:
+    Attributes
+    ----------
         headline (str) -- the headline
         overline (str) -- the overline (default: None)
         subline (str) -- the subline (default: None)
@@ -19,7 +20,8 @@ class NewspaperHeadline:
         day (int or str) -- the publication day (default: None)
         date_string (str) -- date (d.m.y or m.y) as string
 
-    Methods:
+    Methods
+    -------
         add_corpus(newspaper, corpus_csv) -- add a corpus in csv format to a
             NewspaperHeadlineCorpus object
     """
@@ -63,7 +65,8 @@ class NewspaperHeadline:
     def date_string(self):
         """Get publication date as string.
 
-        Return:
+        Return
+        ------
             '{day}.{month}.{year}' if day, month, year;
             '{month}.{year}' if month, year;
             None otherwise

@@ -18,11 +18,13 @@ logging.basicConfig(filename='newspaper_headline_corpus.log',
 class NewspaperHeadlineCorpus:
     """Class for merging newspaper headline corpora to a single corpus.
 
-    Attributes:
+    Attributes
+    ----------
         corpora (dict) -- represents the different newspaper corpora
         data_size (int) -- the number of headlines in the corpus
 
-    Methods:
+    Methods
+    -------
         add_corpus(newspaper, corpus_csv) -- add a corpus in csv format to a
             NewspaperHeadlineCorpus object
     """
@@ -38,7 +40,8 @@ class NewspaperHeadlineCorpus:
         NewspaperHeadline objects constructed from the newspaper corpus as
         value.
 
-        Args:
+        Args
+        ----
             newspaper (str) -- the name of the newspaper
             corpus_csv (str) -- path to the csv file containing the corpus
         """
@@ -64,9 +67,11 @@ class NewspaperHeadlineCorpus:
     def __construct_headline_object(csv_row):
         """Construct NewspaperHeadline object from newspaper corpus entry.
 
-        Args:
+        Args
+        ----
             csv_row (dict) -- csv entry of a headline
-        Returns:
+        Returns
+        -------
             NewspaperHeadline object
         """
         headline = NewspaperHeadline(csv_row['ÜBERSCHRIFT'])
